@@ -1,0 +1,37 @@
+exports.CONST_DB ={
+	DBURL : 'mongodb://localhost:27017/newdb'
+}
+
+exports.CONST_MESSAGE ={
+	cerateStudentError : 'Student could not create'
+}
+
+var HttpStatus = require('http-status-codes');
+
+var errMessage = function (err) {
+    var errMsg = {};
+    if (err.name=='ValidationError'){
+        var obj = {};
+        for(field in err.errors){
+            var key = err.errors[field].path.charAt(0).toUpperCase()+err.errors[field].path.slice(1);
+            if(err.errors[field].properties.type == 'required'){
+                var val = key+' is '+err.errors[field].kind+'.';
+            }
+            else if(err.errors[field].properties.type == 'unique'){
+                var val = key+' has been already taken.'
+            }
+            else{
+                var val = err.errors[field].message;
+            }
+            obj[key] = val;
+        }
+    }
+    errMsg['err']="fill all requireed feild";
+    errMsg['status']=HttpStatus.NOT_FOUND;
+    errMsg['msg']=obj;
+    return errMsg;
+}
+
+exports.errMessage = errMessage;
+
+
